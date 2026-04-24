@@ -15,6 +15,7 @@ def get_conn():
         database=os.getenv("database"),
         user=os.getenv("user"),
         password=os.getenv("Password")
+        port=int(os.getenv("PORT", 5432))
     )
 
 app = FastAPI(title="WebGIS Gempa BMKG API")
