@@ -4,6 +4,8 @@ import psycopg2
 import json
 from dotenv import load_dotenv
 import os
+import subprocess, sys
+import requests as req_http  # tambahkan di bagian import atas
 
 load_dotenv()
 
@@ -96,12 +98,49 @@ def get_stats():
         "magnitude_rata_rata": row[3]
     }
 
-import subprocess, sys
+
 
 @app.get("/api/fetch-bmkg")
 def trigger_fetch():
     try:
-        subprocess.Popen([sys.executable, "fetch_bmkg.py"])
-        return {"status": "ok", "message": "Fetch BMKG triggered"}
+        url = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json"
+        response = req_http.get(url, timeout=10)
+        data = response.json()
+        gempa_list = data["Infogempa"]["gempa"]
+
+        conn = get_conn()
+        cur = conn.cursor()
+
+        count = 0
+        for g in gempa_list:
+            lintang_str = g["Lintang"].replace("°", "").strip()
+            if "LU" in lintang_str:
+                lat = float(lintang_str.replace(" LU", "").strip())
+            elif "LS" in lintang_str:
+                lat = -float(lintang_str.replace(" LS", "").strip())
+            else:
+                lat = float(lintang_str)
+
+            lon = float(g["Bujur"].replace(" BT", "").replace("°", "").strip())
+            jam_str = g["Jam"].split(" ")[0]
+
+            cur.execute("""
+                INSERT INTO gempa 
+                    (tanggal, jam, magnitude, kedalaman, wilayah, potensi, dirasakan, geom)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326))
+            """, (
+                g["Tanggal"], jam_str,
+                float(g["Magnitude"]),
+                g["Kedalaman"], g["Wilayah"],
+                g.get("Potensi", ""), g.get("Dirasakan", ""),
+                lon, lat
+            ))
+            count += 1
+
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"status": "ok", "fetched": count}
+
     except Exception as e:
         return {"status": "error", "message": str(e)}
