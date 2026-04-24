@@ -4,4 +4,4 @@ psycopg2-binary
 requests
 python-dotenv
 geoalchemy2
-sqlalchemygit
+sqlalchemy
