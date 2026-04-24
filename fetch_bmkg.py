@@ -2,14 +2,24 @@ import requests
 import psycopg2
 from datetime import datetime
 import json
+from dotenv import load_dotenv
+import os
+import subprocess, sys
+import requests as req_http  # tambahkan di bagian import atas
+
+load_dotenv()
+
+def get_conn():
+    return psycopg2.connect(
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        port=5432
+    )
 
 # Koneksi ke PostgreSQL
-conn = psycopg2.connect(
-    host="localhost",
-    database="bmkg_gempa",
-    user="postgres",
-    password="harussukses"
-)
+conn = get_conn()
 cur = conn.cursor()
 
 # Buat tabel kalau belum ada
