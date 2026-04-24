@@ -35,8 +35,7 @@ cur.execute("""
         potensi TEXT,
         dirasakan TEXT,
         geom GEOMETRY(Point, 4326),
-        fetched_at TIMESTAMP DEFAULT NOW(),
-        unique_key TEXT
+        fetched_at TIMESTAMP DEFAULT NOW()
     );
 """)
 conn.commit()
@@ -65,21 +64,18 @@ for g in gempa_list:
     # --- Fix Jam: hapus suffix WIB / WITA / WIT ---
     jam_str = g["Jam"].split(" ")[0]  # ambil "10:17:08" saja, buang "WIB"
 
-    unique_key = f"{g['Tanggal'].strip()}_{jam_str.strip()}_{g['Magnitude']}_{g['Wilayah'].strip()}"
-
     cur.execute("""
         INSERT INTO gempa 
-        (tanggal, jam, magnitude, kedalaman, wilayah, potensi, dirasakan, geom, unique_key)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s)
-        ON CONFLICT (unique_key) DO NOTHING
+            (tanggal, jam, magnitude, kedalaman, wilayah, potensi, dirasakan, geom)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326))
+        ON CONFLICT ON CONSTRAINT gempa_unique DO NOTHING
     """, (
         g["Tanggal"], jam_str,
         float(g["Magnitude"]),
         g["Kedalaman"], g["Wilayah"],
         g.get("Potensi", ""), g.get("Dirasakan", ""),
-        lon, lat,
-        unique_key
-    ))
+        lon, lat
+))
 
 conn.commit()
 cur.close()

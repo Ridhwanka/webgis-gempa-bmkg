@@ -130,6 +130,7 @@ def trigger_fetch():
                 INSERT INTO gempa 
                     (tanggal, jam, magnitude, kedalaman, wilayah, potensi, dirasakan, geom)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326))
+                ON CONFLICT ON CONSTRAINT gempa_unique DO NOTHING
             """, (
                 g["Tanggal"], jam_str,
                 float(g["Magnitude"]),
