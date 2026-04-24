@@ -49,20 +49,25 @@ for g in gempa_list:
 
     # --- Fix Bujur ---
     lon = float(g["Bujur"].replace(" BT", "").replace("°", "").strip())
+    
 
     # --- Fix Jam: hapus suffix WIB / WITA / WIT ---
     jam_str = g["Jam"].split(" ")[0]  # ambil "10:17:08" saja, buang "WIB"
 
+    unique_key = f"{g['Tanggal']}_{jam_str}_{round(lat,4)}_{round(lon,4)}_{g['Magnitude']}"
+
     cur.execute("""
         INSERT INTO gempa 
-            (tanggal, jam, magnitude, kedalaman, wilayah, potensi, dirasakan, geom)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326))
+        (tanggal, jam, magnitude, kedalaman, wilayah, potensi, dirasakan, geom, unique_key)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326), %s)
+        ON CONFLICT (unique_key) DO NOTHING
     """, (
         g["Tanggal"], jam_str,
         float(g["Magnitude"]),
         g["Kedalaman"], g["Wilayah"],
         g.get("Potensi", ""), g.get("Dirasakan", ""),
-        lon, lat
+        lon, lat,
+        unique_key
     ))
 
 conn.commit()
