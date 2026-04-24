@@ -1,1 +1,7 @@
-pip freeze > requirements.txt
+fastapi
+uvicorn
+psycopg2-binary
+requests
+python-dotenv
+geoalchemy2
+sqlalchemygit add requirements.txt
