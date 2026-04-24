@@ -542,7 +542,7 @@ document.getElementById('heatmap-toggle').addEventListener('change', function() 
 async function loadGempa(minMag = 0, maxMag = 10) {
   try {
     const res = await fetch(
-      `http://127.0.0.1:8000/api/gempa?min_mag=${minMag}&max_mag=${maxMag}`
+      `https://web-production-567fb.up.railway.app/api/gempa?min_mag=${minMag}&max_mag=${maxMag}`
     );
     const geojson = await res.json();
     renderData(geojson.features);
@@ -555,7 +555,7 @@ async function loadGempa(minMag = 0, maxMag = 10) {
 
 async function loadStats() {
   try {
-    const res  = await fetch('http://127.0.0.1:8000/api/stats');
+    const res  = await fetch('https://web-production-567fb.up.railway.app/api/stats');
     const data = await res.json();
     document.getElementById('stat-total').textContent = data.total_gempa;
     document.getElementById('stat-max').textContent   = data.magnitude_max;
@@ -580,7 +580,7 @@ function startAutoRefresh() {
   async function doRefresh() {
     document.getElementById('refresh-dot').classList.remove('paused');
     // Trigger backend fetch data baru dari BMKG
-    try { await fetch('http://127.0.0.1:8000/api/fetch-bmkg'); } catch(e) {}
+    try { await fetch('https://web-production-567fb.up.railway.app/api/fetch-bmkg'); } catch(e) {}
     // Load ulang data ke peta
     const minMag = document.getElementById('min-mag').value;
     const maxMag = document.getElementById('max-mag').value;
