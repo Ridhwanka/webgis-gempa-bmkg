@@ -14,7 +14,7 @@ def get_conn():
         host=os.getenv("host"),
         database=os.getenv("database"),
         user=os.getenv("user"),
-        password=os.getenv("Password")
+        password=os.getenv("Password"),
         port=int(os.getenv("PORT", 5432))
     )
 
