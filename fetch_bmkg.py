@@ -35,7 +35,8 @@ cur.execute("""
         potensi TEXT,
         dirasakan TEXT,
         geom GEOMETRY(Point, 4326),
-        fetched_at TIMESTAMP DEFAULT NOW()
+        fetched_at TIMESTAMP DEFAULT NOW(),
+        unique_key TEXT
     );
 """)
 conn.commit()
