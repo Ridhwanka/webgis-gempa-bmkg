@@ -64,7 +64,7 @@ for g in gempa_list:
     # --- Fix Jam: hapus suffix WIB / WITA / WIT ---
     jam_str = g["Jam"].split(" ")[0]  # ambil "10:17:08" saja, buang "WIB"
 
-    unique_key = f"{g['Tanggal']}_{jam_str}_{round(lat,4)}_{round(lon,4)}_{g['Magnitude']}"
+    unique_key = f"{g['Tanggal'].strip()}_{jam_str.strip()}_{g['Magnitude']}_{g['Wilayah'].strip()}"
 
     cur.execute("""
         INSERT INTO gempa 
