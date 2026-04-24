@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebGIS Gempa BMKG</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"/>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background: #1e293b;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+      z-index: 1000;
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 15px; font-weight: 700; color: #f8fafc; }
+    header h1 span { color: #f97316; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* AUTO REFRESH indicator */
+    .refresh-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .refresh-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: pulse 2s infinite;
+    }
+    .refresh-dot.paused { background: #64748b; animation: none; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* HEATMAP TOGGLE */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .toggle {
+      position: relative;
+      width: 36px; height: 20px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: #334155;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      left: 3px; top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    input:checked + .toggle-slider { background: #f97316; }
+    input:checked + .toggle-slider:before { transform: translateX(16px); }
+
+    /* MAIN */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 290px;
+      background: #1e293b;
+      border-right: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* STATS */
+    .stats-section {
+      padding: 12px 14px;
+      border-bottom: 1px solid #334155;
+      flex-shrink: 0;
+    }
+    .stats-section h3 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .stat-card {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+    }
+    .stat-card .value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f97316;
+    }
+    .stat-card .label {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #334155;
+      flex-shrink: 0;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: #f97316;
+      border-bottom-color: #f97316;
+      background: #0f172a22;
+    }
+    .tab-btn:hover:not(.active) { color: #94a3b8; }
+
+    /* TAB CONTENT */
+    .tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+    .tab-content.active { display: flex; }
+
+    /* FILTER TAB */
+    .filter-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .filter-row label {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+    }
+    .filter-row label span {
+      font-weight: 700;
+      color: #f97316;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #f97316;
+      margin-top: 4px;
+    }
+    #apply-filter {
+      padding: 9px;
+      background: #f97316;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #apply-filter:hover { background: #ea6c00; }
+
+    /* AUTO REFRESH control */
+    .refresh-control {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .refresh-control label {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .refresh-control label span { color: #f97316; font-weight: 700; }
+    .refresh-progress {
+      height: 3px;
+      background: #334155;
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .refresh-bar {
+      height: 100%;
+      background: #f97316;
+      border-radius: 3px;
+      transition: width 1s linear;
+    }
+    .refresh-status {
+      font-size: 10px;
+      color: #475569;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* DAFTAR GEMPA TAB */
+    .gempa-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+    .gempa-list::-webkit-scrollbar { width: 4px; }
+    .gempa-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    .gempa-item {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .gempa-item:hover { border-left-color: #f97316; background: #1a2744; }
+    .gempa-item .mag {
+      font-size: 17px;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+    .gempa-item .wilayah {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gempa-item .meta { font-size: 10px; color: #475569; margin-top: 2px; }
+
+    /* Warna magnitude */
+    .mag-rendah  { color: #22c55e; }
+    .mag-sedang  { color: #f59e0b; }
+    .mag-tinggi  { color: #ef4444; }
+
+    /* MAP */
+    #map { flex: 1; }
+
+    /* POPUP */
+    .leaflet-popup-content-wrapper {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 10px;
+    }
+    .leaflet-popup-tip { background: #1e293b; }
+    .popup-mag { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 6px; }
+    .popup-row { font-size: 12px; color: #94a3b8; margin: 3px 0; }
+    .popup-row strong { color: #e2e8f0; }
+
+    /* COUNTDOWN badge */
+    #countdown-badge {
+      font-size: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 3px 8px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🌏 WebGIS Gempa <span>BMKG</span></h1>
+  <div class="header-right">
+    <div class="refresh-indicator">
+      <div class="refresh-dot" id="refresh-dot"></div>
+      <span id="last-updated">Memuat...</span>
+    </div>
+    <span id="countdown-badge">–</span>
+    <div class="toggle-wrap">
+      🌡️ Heatmap
+      <label class="toggle">
+        <input type="checkbox" id="heatmap-toggle"/>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+
+    <!-- STATS -->
+    <div class="stats-section">
+      <h3>📊 Statistik</h3>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="value" id="stat-total">-</div>
+          <div class="label">Total Gempa</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="stat-max">-</div>
+          <div class="label">Maks. Mag</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="stat-min">-</div>
+          <div class="label">Min. Mag</div>
+        </div>
+        <div class="stat-card">
+          <div class="value" id="stat-avg">-</div>
+          <div class="label">Rata-rata</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('filter')">🔍 Filter</button>
+      <button class="tab-btn" onclick="switchTab('daftar')">📋 Daftar Gempa</button>
+    </div>
+
+    <!-- TAB: FILTER -->
+    <div class="tab-content active" id="tab-filter">
+      <div class="filter-body">
+
+        <div class="filter-row">
+          <label>Magnitudo Minimum <span id="min-mag-val">0</span></label>
+          <input type="range" id="min-mag" min="0" max="9" step="0.5" value="0"
+            oninput="document.getElementById('min-mag-val').textContent=this.value"/>
+        </div>
+
+        <div class="filter-row">
+          <label>Magnitudo Maksimum <span id="max-mag-val">9</span></label>
+          <input type="range" id="max-mag" min="0" max="9" step="0.5" value="9"
+            oninput="document.getElementById('max-mag-val').textContent=this.value"/>
+        </div>
+
+        <button id="apply-filter">Terapkan Filter</button>
+
+        <!-- AUTO REFRESH -->
+        <div class="refresh-control">
+          <label>
+            ⏱ Auto-refresh
+            <span id="refresh-interval-val">5 menit</span>
+          </label>
+          <input type="range" id="refresh-interval" min="1" max="30" step="1" value="5"
+            oninput="onRefreshIntervalChange(this.value)"/>
+          <div class="refresh-progress">
+            <div class="refresh-bar" id="refresh-bar" style="width:100%"></div>
+          </div>
+          <div class="refresh-status" id="refresh-status">Refresh berikutnya: –</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB: DAFTAR GEMPA -->
+    <div class="tab-content" id="tab-daftar">
+      <div class="gempa-list" id="gempa-list"></div>
+    </div>
+
+  </div>
+
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+<script>
+// ── Peta ────────────────────────────────────────────────
+const map = L.map('map', { center: [-2.5, 118], zoom: 5 });
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© CartoDB © OpenStreetMap', maxZoom: 18
+}).addTo(map);
+
+let markersLayer = L.layerGroup().addTo(map);
+let heatLayer    = null;
+let currentData  = [];
+
+// ── Warna ───────────────────────────────────────────────
+function getColor(mag) {
+  if (mag >= 6)   return '#ef4444';
+  if (mag >= 4.5) return '#f59e0b';
+  return '#22c55e';
+}
+function getMagClass(mag) {
+  if (mag >= 6)   return 'mag-tinggi';
+  if (mag >= 4.5) return 'mag-sedang';
+  return 'mag-rendah';
+}
+function makeCircle(mag) {
+  return {
+    radius: Math.max(6, mag * 4.5),
+    fillColor: getColor(mag),
+    color: '#fff',
+    weight: 1.5,
+    opacity: 0.9,
+    fillOpacity: 0.7
+  };
+}
+
+// ── Render data ke peta & list ──────────────────────────
+function renderData(features) {
+  markersLayer.clearLayers();
+  document.getElementById('gempa-list').innerHTML = '';
+  currentData = features;
+
+  const heatPoints = [];
+
+  features.forEach(f => {
+    const p = f.properties;
+    const [lon, lat] = f.geometry.coordinates;
+    const mag = p.magnitude;
+
+    // Heatmap points
+    heatPoints.push([lat, lon, mag / 9]);
+
+    // Marker
+    const circle = L.circleMarker([lat, lon], makeCircle(mag));
+    circle.bindPopup(`
+      <div class="popup-mag ${getMagClass(mag)}">M ${mag}</div>
+      <div class="popup-row">📍 <strong>${p.wilayah}</strong></div>
+      <div class="popup-row">📅 ${p.tanggal} — ${p.jam}</div>
+      <div class="popup-row">⬇️ Kedalaman: <strong>${p.kedalaman}</strong></div>
+      <div class="popup-row">⚠️ Potensi: <strong>${p.potensi || 'Tidak ada info'}</strong></div>
+      <div class="popup-row">🫨 Dirasakan: <strong>${p.dirasakan || '-'}</strong></div>
+    `, { maxWidth: 250 });
+    markersLayer.addLayer(circle);
+
+    // Sidebar list
+    const item = document.createElement('div');
+    item.className = 'gempa-item';
+    item.innerHTML = `
+      <div>
+        <span class="mag ${getMagClass(mag)}">M ${mag}</span>
+        <span style="font-size:10px;color:#64748b">${p.kedalaman}</span>
+      </div>
+      <div class="wilayah">${p.wilayah}</div>
+      <div class="meta">${p.tanggal} · ${p.jam}</div>
+    `;
+    item.addEventListener('click', () => {
+      switchTab('daftar'); // tetap di tab daftar
+      map.flyTo([lat, lon], 8, { duration: 1.2 });
+      circle.openPopup();
+    });
+    document.getElementById('gempa-list').appendChild(item);
+  });
+
+  // Update heatmap kalau aktif
+  updateHeatmap(heatPoints);
+}
+
+// ── Heatmap ─────────────────────────────────────────────
+function updateHeatmap(points) {
+  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+  if (document.getElementById('heatmap-toggle').checked) {
+    heatLayer = L.heatLayer(points, {
+      radius: 30, blur: 20, maxZoom: 10,
+      gradient: { 0.3: '#22c55e', 0.6: '#f59e0b', 1.0: '#ef4444' }
+    }).addTo(map);
+    markersLayer.clearLayers(); // sembunyikan marker saat heatmap aktif
+  }
+}
+
+document.getElementById('heatmap-toggle').addEventListener('change', function() {
+  const heatPoints = currentData.map(f => {
+    const [lon, lat] = f.geometry.coordinates;
+    return [lat, lon, f.properties.magnitude / 9];
+  });
+
+  if (this.checked) {
+    // Aktifkan heatmap, sembunyikan marker
+    markersLayer.clearLayers();
+    heatLayer = L.heatLayer(heatPoints, {
+      radius: 30, blur: 20, maxZoom: 10,
+      gradient: { 0.3: '#22c55e', 0.6: '#f59e0b', 1.0: '#ef4444' }
+    }).addTo(map);
+  } else {
+    // Matikan heatmap, tampilkan marker kembali
+    if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+    // Re-render marker dari currentData
+    currentData.forEach(f => {
+      const p = f.properties;
+      const [lon, lat] = f.geometry.coordinates;
+      const circle = L.circleMarker([lat, lon], makeCircle(p.magnitude));
+      circle.bindPopup(`
+        <div class="popup-mag ${getMagClass(p.magnitude)}">M ${p.magnitude}</div>
+        <div class="popup-row">📍 <strong>${p.wilayah}</strong></div>
+        <div class="popup-row">📅 ${p.tanggal} — ${p.jam}</div>
+        <div class="popup-row">⬇️ Kedalaman: <strong>${p.kedalaman}</strong></div>
+        <div class="popup-row">⚠️ Potensi: <strong>${p.potensi || 'Tidak ada info'}</strong></div>
+        <div class="popup-row">🫨 Dirasakan: <strong>${p.dirasakan || '-'}</strong></div>
+      `, { maxWidth: 250 });
+      markersLayer.addLayer(circle);
+    });
+  }
+});
+
+// ── Fetch data ──────────────────────────────────────────
+async function loadGempa(minMag = 0, maxMag = 10) {
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:8000/api/gempa?min_mag=${minMag}&max_mag=${maxMag}`
+    );
+    const geojson = await res.json();
+    renderData(geojson.features);
+    document.getElementById('last-updated').textContent =
+      `Update: ${new Date().toLocaleTimeString('id-ID')}`;
+  } catch(e) {
+    document.getElementById('last-updated').textContent = 'Gagal fetch data';
+  }
+}
+
+async function loadStats() {
+  try {
+    const res  = await fetch('http://127.0.0.1:8000/api/stats');
+    const data = await res.json();
+    document.getElementById('stat-total').textContent = data.total_gempa;
+    document.getElementById('stat-max').textContent   = data.magnitude_max;
+    document.getElementById('stat-min').textContent   = data.magnitude_min;
+    document.getElementById('stat-avg').textContent   = data.magnitude_rata_rata;
+  } catch(e) {}
+}
+
+// ── Auto Refresh ────────────────────────────────────────
+let refreshIntervalMinutes = 5;
+let secondsLeft = refreshIntervalMinutes * 60;
+let refreshTimer  = null;
+let countdownTimer = null;
+
+function startAutoRefresh() {
+  clearInterval(refreshTimer);
+  clearInterval(countdownTimer);
+
+  secondsLeft = refreshIntervalMinutes * 60;
+
+  // Jalankan fetch BMKG di backend, lalu reload peta
+  async function doRefresh() {
+    document.getElementById('refresh-dot').classList.remove('paused');
+    // Trigger backend fetch data baru dari BMKG
+    try { await fetch('http://127.0.0.1:8000/api/fetch-bmkg'); } catch(e) {}
+    // Load ulang data ke peta
+    const minMag = document.getElementById('min-mag').value;
+    const maxMag = document.getElementById('max-mag').value;
+    await loadGempa(minMag, maxMag);
+    await loadStats();
+    secondsLeft = refreshIntervalMinutes * 60;
+  }
+
+  refreshTimer = setInterval(doRefresh, refreshIntervalMinutes * 60 * 1000);
+
+  // Countdown UI
+  countdownTimer = setInterval(() => {
+    secondsLeft--;
+    const m = Math.floor(secondsLeft / 60);
+    const s = secondsLeft % 60;
+    document.getElementById('countdown-badge').textContent =
+      `⏱ ${m}:${s.toString().padStart(2,'0')}`;
+    document.getElementById('refresh-status').textContent =
+      `Refresh berikutnya: ${m} menit ${s} detik`;
+    const pct = (secondsLeft / (refreshIntervalMinutes * 60)) * 100;
+    document.getElementById('refresh-bar').style.width = pct + '%';
+
+    if (secondsLeft <= 0) secondsLeft = refreshIntervalMinutes * 60;
+  }, 1000);
+}
+
+function onRefreshIntervalChange(val) {
+  refreshIntervalMinutes = parseInt(val);
+  document.getElementById('refresh-interval-val').textContent = val + ' menit';
+  startAutoRefresh();
+}
+
+// ── Tab switch ──────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 ? 'filter' : 'daftar') === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(el => {
+    el.classList.toggle('active', el.id === 'tab-' + name);
+  });
+}
+
+// ── Filter ──────────────────────────────────────────────
+document.getElementById('apply-filter').addEventListener('click', () => {
+  const minMag = document.getElementById('min-mag').value;
+  const maxMag = document.getElementById('max-mag').value;
+  loadGempa(minMag, maxMag);
+});
+
+// ── Init ────────────────────────────────────────────────
+loadStats();
+loadGempa();
+startAutoRefresh();
+</script>
+</body>
+</html>
