@@ -433,7 +433,7 @@
       <div class="logo-icon">🌏</div>
       <div class="logo-text">
         <span class="title" id="site-title">WebGIS Gempa BMKG</span>
-        <span class="subtitle">Monitoring Seismik Indonesia</span>
+        <!-- <span class="subtitle">Monitoring Seismik Indonesia</span> -->
       </div>
     </div>
   </div>
@@ -470,33 +470,19 @@
       <!-- ═══ VIEW: PETA ════════════════════════════════ -->
       <div id="view-peta">
 
-        <!-- [0] Deskripsi — selalu tampil -->
-        <div class="sb-desc">
-          <div class="sb-desc-title">ℹ️ Tentang WebGIS Ini</div>
-          <p>
-            Platform monitoring gempa bumi real-time untuk wilayah Indonesia.
-            Data diperbarui otomatis dari sumber resmi pemerintah.
-          </p>
-          <p>
-            <span class="db-badge">🗄️ BMKG API</span>
-            &nbsp;Badan Meteorologi, Klimatologi, dan Geofisika. Mencakup seluruh gempa yang tercatat jaringan seismograf nasional.
-          </p>
-          <div class="stat-inline">
-            <div class="stat-inline-item">
-              <span class="sil-val" id="si-total">–</span>
-              <span class="sil-lbl">Total Gempa</span>
-            </div>
-            <div class="stat-inline-item">
-              <span class="sil-val" id="si-max">–</span>
-              <span class="sil-lbl">Maks. Mag.</span>
-            </div>
-            <div class="stat-inline-item">
-              <span class="sil-val" id="si-min">–</span>
-              <span class="sil-lbl">Min. Mag.</span>
-            </div>
-            <div class="stat-inline-item">
-              <span class="sil-val" id="si-avg">–</span>
-              <span class="sil-lbl">Rata-rata</span>
+        <div class="accordion open" id="acc-about">
+          <div class="accordion-header" onclick="toggleAccordion('acc-about')">
+            <span class="accordion-label">
+              <span class="acc-icon">ℹ️</span> Tentang WebGIS Ini
+            </span>
+            <svg class="accordion-chevron" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+            </svg>
+          </div>
+          <div class="accordion-body">
+            <div class="accordion-inner sb-desc">
+              <p>Platform monitoring gempa bumi real-time untuk wilayah Indonesia. Data diperbarui otomatis dari <span class="db-badge">🗄️ BMKG API</span>.</p>
+              <p>Mencakup seluruh gempa yang tercatat jaringan seismograf nasional.</p>
             </div>
           </div>
         </div>
@@ -619,15 +605,15 @@
       <div class="fstat-row">
         <div class="fstat-item">
           <span class="fstat-val" id="stat-total">–</span>
-          <span class="fstat-lbl">Total</span>
+          <span class="fstat-lbl">Total Gempa</span>
         </div>
         <div class="fstat-item">
           <span class="fstat-val" id="stat-max">–</span>
-          <span class="fstat-lbl">Maks M</span>
+          <span class="fstat-lbl">Maks Magnitudo</span>
         </div>
         <div class="fstat-item">
           <span class="fstat-val" id="stat-min">–</span>
-          <span class="fstat-lbl">Min M</span>
+          <span class="fstat-lbl">Min Magnitudo</span>
         </div>
         <div class="fstat-item">
           <span class="fstat-val" id="stat-avg">–</span>
@@ -676,7 +662,22 @@ function toggleTheme(el) {
 
 // ── Accordion ────────────────────────────────────────────
 function toggleAccordion(id) {
-  document.getElementById(id).classList.toggle('open');
+  const target = document.getElementById(id);
+  const allAccordions = document.querySelectorAll('.accordion');
+  
+  // Periksa apakah yang diklik sudah terbuka
+  const isAlreadyOpen = target.classList.contains('open');
+
+  // Tutup semua accordion
+  allAccordions.forEach(acc => {
+    acc.classList.remove('open');
+  });
+
+  // Jika yang diklik tadi belum terbuka, maka buka
+  // Jika yang diklik tadi sudah terbuka, biarkan tetap tertutup (opsional)
+  if (!isAlreadyOpen) {
+    target.classList.add('open');
+  }
 }
 
 // ── View switch ──────────────────────────────────────────
@@ -730,7 +731,7 @@ function getMagClass(mag) {
   return 'mag-rendah';
 }
 function makeCircle(mag) {
-  return { radius: Math.max(6, mag * 4.5), fillColor: getColor(mag), color: '#fff', weight: 1.5, opacity: 0.9, fillOpacity: 0.7 };
+  return { radius: Math.max(1, mag * 1.5), fillColor: getColor(mag), color: '#fff', weight: 1.5, opacity: 0.9, fillOpacity: 0.7 };
 }
 function makePopup(p, mag) {
   return `
@@ -771,7 +772,7 @@ function renderData(features) {
       <div class="meta">${p.tanggal} · ${p.jam}</div>
     `;
     item.addEventListener('click', () => {
-      setView('peta');
+      // setView('peta');
       map.flyTo([lat, lon], 8, { duration: 1.2 });
       circle.openPopup();
     });
