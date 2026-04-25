@@ -12,36 +12,35 @@
   <style>
     /* ─── CSS VARIABLES ─────────────────────────────────── */
     :root {
-      --bg:         #0d1420;
-      --bg2:        #151f2e;
-      --bg3:        #1a2740;
-      --border:     #233047;
-      --text:       #d4dce8;
-      --text-muted: #56687d;
-      --text-dim:   #384f65;
-      --accent:     #f97316;
-      --accent-dim: rgba(249,115,22,0.15);
-      --green:      #22c55e;
-      --yellow:     #f59e0b;
-      --red:        #ef4444;
-      --sidebar-w:  280px;
-      --header-h:   52px;
-      --statusbar-h: 44px;
-      --radius:     8px;
-      --shadow:     0 4px 24px rgba(0,0,0,0.4);
-      --trans:      0.25s ease;
+      --bg:           #0d1420;
+      --bg2:          #151f2e;
+      --bg3:          #1a2740;
+      --border:       #233047;
+      --text:         #d4dce8;
+      --text-muted:   #56687d;
+      --text-dim:     #384f65;
+      --accent:       #f97316;
+      --accent-dim:   rgba(249,115,22,0.15);
+      --green:        #22c55e;
+      --yellow:       #f59e0b;
+      --red:          #ef4444;
+      --sidebar-w:    280px;
+      --header-h:     52px;
+      --radius:       8px;
+      --shadow:       0 4px 24px rgba(0,0,0,0.45);
+      --trans:        0.28s ease;
     }
     [data-theme="light"] {
-      --bg:         #f0f4f8;
-      --bg2:        #ffffff;
-      --bg3:        #e8eef5;
-      --border:     #d1dce9;
-      --text:       #1e3050;
-      --text-muted: #6b80a0;
-      --text-dim:   #9fb3cc;
-      --accent:     #e8600a;
-      --accent-dim: rgba(232,96,10,0.12);
-      --shadow:     0 4px 24px rgba(0,0,0,0.12);
+      --bg:           #f0f4f8;
+      --bg2:          #ffffff;
+      --bg3:          #e8eef5;
+      --border:       #d1dce9;
+      --text:         #1e3050;
+      --text-muted:   #6b80a0;
+      --text-dim:     #9fb3cc;
+      --accent:       #e8600a;
+      --accent-dim:   rgba(232,96,10,0.12);
+      --shadow:       0 4px 24px rgba(0,0,0,0.14);
     }
 
     /* ─── RESET ─────────────────────────────────────────── */
@@ -65,139 +64,72 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px 0 0;
+      padding: 0 14px;
       z-index: 1100;
       flex-shrink: 0;
       transition: background var(--trans), border-color var(--trans);
     }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      gap: 0;
-    }
-
-    /* Sidebar toggle button */
-    #sidebar-toggle {
-      height: 100%;
-      width: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      border-right: 1px solid var(--border);
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: color var(--trans), background var(--trans);
-      flex-shrink: 0;
-    }
-    #sidebar-toggle:hover { background: var(--bg3); color: var(--accent); }
-    #sidebar-toggle svg { width: 18px; height: 18px; }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 14px;
-    }
+    .header-left { display: flex; align-items: center; }
+    .logo { display: flex; align-items: center; gap: 9px; }
     .logo-icon {
-      width: 30px; height: 30px;
+      width: 28px; height: 28px;
       background: var(--accent);
       border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 15px;
-      flex-shrink: 0;
+      font-size: 14px; flex-shrink: 0;
     }
-    .logo-text {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-    }
+    .logo-text { display: flex; flex-direction: column; line-height: 1.15; }
     .logo-text .title {
       font-family: 'Space Mono', monospace;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.3px;
+      font-size: 12px; font-weight: 700;
+      color: var(--text); letter-spacing: -0.2px;
     }
     .logo-text .subtitle {
-      font-size: 10px;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+      font-size: 9px; color: var(--text-muted);
+      letter-spacing: 0.6px; text-transform: uppercase;
+    }
+    @media (max-width: 480px) {
+      .logo-text .subtitle { display: none; }
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Live indicator */
+    .header-right { display: flex; align-items: center; gap: 8px; }
     .live-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      font-family: 'Space Mono', monospace;
+      display: flex; align-items: center; gap: 5px;
+      font-size: 10px; font-family: 'Space Mono', monospace;
       color: var(--text-muted);
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 4px 10px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 9px;
     }
     .live-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: blink 2s infinite;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); animation: blink 2s infinite;
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
 
-    /* Dark/Light toggle */
-    .theme-toggle {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 11px;
-      color: var(--text-muted);
-      cursor: pointer;
-      user-select: none;
-    }
-    .theme-toggle .icon { font-size: 14px; }
-    .toggle-pill {
-      position: relative;
-      width: 40px; height: 22px;
-    }
+    .theme-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+    .theme-toggle .icon { font-size: 13px; }
+    .toggle-pill { position: relative; width: 38px; height: 21px; }
     .toggle-pill input { opacity: 0; width: 0; height: 0; }
     .pill-track {
-      position: absolute;
-      inset: 0;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      cursor: pointer;
-      transition: background var(--trans);
+      position: absolute; inset: 0;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 22px; cursor: pointer;
+      transition: background var(--trans), border-color var(--trans);
     }
     .pill-thumb {
-      position: absolute;
-      top: 3px; left: 3px;
-      width: 14px; height: 14px;
-      background: var(--text-muted);
-      border-radius: 50%;
+      position: absolute; top: 3px; left: 3px;
+      width: 13px; height: 13px;
+      background: var(--text-muted); border-radius: 50%;
       transition: transform var(--trans), background var(--trans);
+      pointer-events: none;
     }
-    input:checked ~ .pill-track { background: var(--accent-dim); border-color: var(--accent); }
-    input:checked ~ .pill-thumb { transform: translateX(18px); background: var(--accent); }
+    input:checked ~ .pill-track  { background: var(--accent-dim); border-color: var(--accent); }
+    input:checked ~ .pill-thumb  { transform: translateX(17px); background: var(--accent); }
 
-    /* ─── BODY AREA ──────────────────────────────────────── */
+    /* ─── MAIN AREA ──────────────────────────────────────── */
     .main {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-      position: relative;
+      display: flex; flex: 1;
+      overflow: hidden; position: relative;
     }
 
     /* ─── SIDEBAR ────────────────────────────────────────── */
@@ -205,208 +137,196 @@
       width: var(--sidebar-w);
       background: var(--bg2);
       border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      overflow: hidden;
+      display: flex; flex-direction: column;
+      flex-shrink: 0; overflow: hidden;
       transition: width var(--trans), opacity var(--trans), border-color var(--trans);
-      z-index: 1000;
+      z-index: 900;
+      position: relative;
     }
     .sidebar.collapsed {
-      width: 0;
-      border-right-width: 0;
-      opacity: 0;
-      pointer-events: none;
+      width: 0; border-right-width: 0;
+      opacity: 0; pointer-events: none;
     }
 
-    /* Section headers */
-    .sb-section {
+    /* ─── ARROW TOGGLE TAB ───────────────────────────────── */
+    /* Floats on the body vertically centered, sticks to sidebar edge */
+    #sidebar-arrow {
+      position: absolute;
+      left: var(--sidebar-w);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1000;
+      width: 16px; height: 48px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      box-shadow: 3px 0 12px rgba(0,0,0,0.3);
+      transition: left var(--trans), background var(--trans), color var(--trans), border-color var(--trans);
+    }
+    #sidebar-arrow:hover { background: var(--bg3); color: var(--accent); }
+    #sidebar-arrow svg {
+      width: 9px; height: 9px;
+      transition: transform var(--trans);
+    }
+    /* Collapsed state: move arrow to left:0, flip direction */
+    body.sb-collapsed #sidebar-arrow {
+      left: 0;
+    }
+    body.sb-collapsed #sidebar-arrow svg {
+      transform: rotate(180deg);
+    }
+
+    /* ─── SIDEBAR CONTENT ────────────────────────────────── */
+    .view-switch {
+      display: flex; gap: 6px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
-      transition: border-color var(--trans);
-    }
-    .sb-section-title {
-      font-size: 9px;
-      font-family: 'Space Mono', monospace;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-dim);
-      padding: 10px 14px 6px;
-    }
-    .sb-body {
-      padding: 6px 14px 12px;
-    }
-
-    /* View toggle (Peta / Daftar) */
-    .view-switch {
-      display: flex;
-      gap: 6px;
-      padding: 10px 14px;
     }
     .view-btn {
-      flex: 1;
-      padding: 7px 6px;
+      flex: 1; padding: 7px 6px;
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--trans);
-      font-family: 'DM Sans', sans-serif;
+      background: transparent; color: var(--text-muted);
+      font-size: 11px; font-weight: 600; cursor: pointer;
+      transition: all var(--trans); font-family: 'DM Sans', sans-serif;
     }
-    .view-btn.active {
-      background: var(--accent-dim);
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .view-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
     .view-btn:hover:not(.active) { background: var(--bg3); color: var(--text); }
 
-    /* Scrollable content area */
-    .sb-scroll {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
+    .sb-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; }
     .sb-scroll::-webkit-scrollbar { width: 3px; }
     .sb-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* Filter sliders */
-    .filter-row {
-      margin-bottom: 12px;
+    /* ─── DESCRIPTION PANEL ──────────────────────────────── */
+    .sb-desc {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
     }
-    .filter-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 5px;
+    .sb-desc-title {
+      font-size: 11px; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
     }
-    .filter-label span {
-      font-weight: 700;
+    .sb-desc p {
+      font-size: 11px; color: var(--text-muted);
+      line-height: 1.65; margin-bottom: 7px;
+    }
+    .sb-desc p:last-of-type { margin-bottom: 0; }
+    .db-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-family: 'Space Mono', monospace;
+      color: var(--accent); background: var(--accent-dim);
+      border: 1px solid var(--accent); border-radius: 4px;
+      padding: 2px 7px; white-space: nowrap;
+    }
+    .stat-inline {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5px; margin-top: 10px;
+    }
+    .stat-inline-item {
+      background: var(--bg3); border-radius: 6px;
+      padding: 7px 10px; display: flex; flex-direction: column;
+    }
+    .sil-val {
+      font-size: 16px; font-weight: 700;
       font-family: 'Space Mono', monospace;
-      color: var(--accent);
+      color: var(--accent); line-height: 1;
     }
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-      cursor: pointer;
+    .sil-lbl {
+      font-size: 9px; color: var(--text-dim);
+      margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px;
     }
 
+    /* ─── ACCORDION ──────────────────────────────────────── */
+    .accordion { border-bottom: 1px solid var(--border); }
+    .accordion-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; cursor: pointer; user-select: none;
+      transition: background var(--trans);
+    }
+    .accordion-header:hover { background: var(--bg3); }
+    .accordion-label {
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .accordion-label .acc-icon { font-size: 13px; }
+    .accordion-chevron {
+      width: 14px; height: 14px; color: var(--text-dim);
+      transition: transform var(--trans); flex-shrink: 0;
+    }
+    .accordion.open .accordion-chevron { transform: rotate(180deg); }
+    .accordion-body { max-height: 0; overflow: hidden; transition: max-height 0.32s ease; }
+    .accordion.open .accordion-body { max-height: 600px; }
+    .accordion-inner { padding: 4px 14px 14px; }
+
+    /* ─── FILTER ─────────────────────────────────────────── */
+    .filter-row { margin-bottom: 12px; }
+    .filter-label {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--text-muted); margin-bottom: 5px;
+    }
+    .filter-label span { font-weight: 700; font-family: 'Space Mono', monospace; color: var(--accent); }
+    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
     #apply-filter {
-      width: 100%;
-      padding: 9px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
+      width: 100%; padding: 8px;
+      background: var(--accent); color: white;
+      border: none; border-radius: var(--radius);
+      font-size: 12px; font-weight: 700; cursor: pointer;
       font-family: 'DM Sans', sans-serif;
-      transition: opacity var(--trans);
-      margin-top: 4px;
+      transition: opacity var(--trans); margin-top: 2px;
     }
     #apply-filter:hover { opacity: 0.85; }
 
-    /* Basemap options */
-    .basemap-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
+    /* ─── BASEMAP ─────────────────────────────────────────── */
+    .basemap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
     .basemap-btn {
-      padding: 8px 6px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: var(--bg3);
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      transition: all var(--trans);
-      font-family: 'DM Sans', sans-serif;
+      padding: 7px 5px; border-radius: var(--radius);
+      border: 1px solid var(--border); background: var(--bg3);
+      color: var(--text-muted); font-size: 10px; font-weight: 600;
+      cursor: pointer; text-align: center;
+      transition: all var(--trans); font-family: 'DM Sans', sans-serif;
       line-height: 1.3;
     }
-    .basemap-btn.active {
-      border-color: var(--accent);
-      background: var(--accent-dim);
-      color: var(--accent);
-    }
+    .basemap-btn.active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
     .basemap-btn:hover:not(.active) { color: var(--text); background: var(--bg); }
-    .basemap-btn .bm-icon { font-size: 16px; display: block; margin-bottom: 3px; }
+    .basemap-btn .bm-icon { font-size: 15px; display: block; margin-bottom: 2px; }
 
-    /* Heatmap toggle */
+    /* ─── LAYER TOGGLES ──────────────────────────────────── */
     .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
+      display: flex; align-items: center; justify-content: space-between; padding: 6px 0;
     }
-    .toggle-row-label {
-      font-size: 12px;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .toggle-row-label .icon { font-size: 14px; }
-
+    .toggle-row-label { font-size: 12px; color: var(--text); display: flex; align-items: center; gap: 7px; }
     .mini-toggle { position: relative; width: 38px; height: 22px; }
     .mini-toggle input { opacity: 0; width: 0; height: 0; }
     .mini-track {
-      position: absolute; inset: 0;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      cursor: pointer;
+      position: absolute; inset: 0; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: 22px; cursor: pointer;
       transition: background var(--trans), border-color var(--trans);
     }
     .mini-thumb {
-      position: absolute;
-      top: 3px; left: 3px;
-      width: 14px; height: 14px;
-      background: var(--text-dim);
-      border-radius: 50%;
-      transition: transform var(--trans), background var(--trans);
+      position: absolute; top: 3px; left: 3px;
+      width: 14px; height: 14px; background: var(--text-dim); border-radius: 50%;
+      transition: transform var(--trans), background var(--trans); pointer-events: none;
     }
     .mini-toggle input:checked ~ .mini-track { background: var(--accent-dim); border-color: var(--accent); }
     .mini-toggle input:checked ~ .mini-thumb { transform: translateX(16px); background: var(--accent); }
 
-    /* Auto refresh control */
     .refresh-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
+      font-size: 11px; color: var(--text-muted);
+      display: flex; justify-content: space-between; margin-bottom: 5px;
     }
     .refresh-label span { font-family: 'Space Mono', monospace; color: var(--accent); font-weight: 700; }
-    .refresh-progress {
-      height: 3px;
-      background: var(--bg3);
-      border-radius: 3px;
-      margin-top: 8px;
-    }
-    .refresh-bar {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 3px;
-      transition: width 1s linear;
-    }
 
-    /* Gempa list */
-    .gempa-list { padding: 8px 8px; }
+    /* ─── GEMPA LIST ─────────────────────────────────────── */
+    .gempa-list { padding: 6px 8px; }
     .gempa-item {
-      background: var(--bg3);
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      margin-bottom: 6px;
-      cursor: pointer;
-      border-left: 3px solid transparent;
-      transition: all 0.15s;
+      background: var(--bg3); border-radius: var(--radius);
+      padding: 10px 12px; margin-bottom: 6px;
+      cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s;
     }
     .gempa-item:hover { border-left-color: var(--accent); background: var(--accent-dim); }
     .gempa-item-top { display: flex; justify-content: space-between; align-items: baseline; }
@@ -415,152 +335,93 @@
     .gempa-item .wilayah { font-size: 11px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .gempa-item .meta { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
 
-    /* Magnitude colors */
     .mag-rendah { color: var(--green); }
     .mag-sedang  { color: var(--yellow); }
     .mag-tinggi  { color: var(--red); }
 
-    /* ─── MAP AREA ───────────────────────────────────────── */
-    #map {
-      flex: 1;
-      position: relative;
-    }
+    /* ─── MAP ────────────────────────────────────────────── */
+    #map { flex: 1; }
 
-    /* ─── STATUS BAR (bottom) ────────────────────────────── */
-    .status-bar {
-      height: var(--statusbar-h);
+    /* ─── FLOATING STATS ─────────────────────────────────── */
+    #floating-stats {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 800;
       background: var(--bg2);
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      gap: 0;
-      z-index: 1100;
-      flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 10px 16px 8px;
+      pointer-events: none;
+      min-width: 260px;
+      max-width: calc(100vw - 36px);
       transition: background var(--trans), border-color var(--trans);
-      overflow: hidden;
     }
-
-    .stat-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 16px 0 0;
+    .fstat-row {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .fstat-item {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0 12px;
       border-right: 1px solid var(--border);
-      margin-right: 16px;
-      flex-shrink: 0;
     }
-    .stat-pill:last-of-type { border-right: none; margin-right: 0; }
-    .stat-pill .sp-label {
-      font-size: 10px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    .fstat-item:last-child { border-right: none; }
+    .fstat-val {
+      font-size: 17px; font-weight: 700;
       font-family: 'Space Mono', monospace;
+      color: var(--accent); line-height: 1;
     }
-    .stat-pill .sp-value {
-      font-size: 15px;
-      font-weight: 700;
-      font-family: 'Space Mono', monospace;
-      color: var(--accent);
+    .fstat-lbl {
+      font-size: 9px; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px;
+    }
+    .fstat-footer {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; margin-top: 7px; padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+    .fstat-footer .upd { font-size: 10px; color: var(--text-dim); font-family: 'Space Mono', monospace; }
+    .fstat-footer .upd span { color: var(--text-muted); }
+    .refresh-mini-bar { width: 48px; height: 2px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+    .refresh-mini-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 1s linear; }
+    .fstat-footer .cd { font-size: 10px; color: var(--text-dim); display: flex; align-items: center; gap: 4px; }
+    .cd-val { font-family: 'Space Mono', monospace; color: var(--accent); font-weight: 700; }
+
+    @media (max-width: 600px) {
+      :root { --sidebar-w: 265px; }
+      #floating-stats { padding: 8px 10px 7px; min-width: 0; width: calc(100vw - 32px); }
+      .fstat-item { padding: 0 9px; }
+      .fstat-val { font-size: 15px; }
+      .legend { display: none; }
     }
 
-    .status-bar-right {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
+    /* ─── LEGEND ─────────────────────────────────────────── */
+    .legend {
+      position: absolute; right: 12px; top: 12px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px 12px;
+      z-index: 800; font-size: 11px; pointer-events: none;
+      transition: background var(--trans), border-color var(--trans);
     }
-
-    .update-info {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 1px;
+    .legend-title {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-dim); font-family: 'Space Mono', monospace; margin-bottom: 7px;
     }
-    .update-info .upd-label {
-      font-size: 10px;
-      color: var(--text-muted);
-    }
-    .update-info .upd-label span {
-      font-family: 'Space Mono', monospace;
-      color: var(--text);
-    }
-    .update-info .countdown-row {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      color: var(--text-dim);
-    }
-    .countdown-row .cd-timer {
-      font-family: 'Space Mono', monospace;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .refresh-mini-bar {
-      width: 80px;
-      height: 3px;
-      background: var(--bg3);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .refresh-mini-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 3px;
-      transition: width 1s linear;
-    }
+    .legend-item { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; color: var(--text-muted); }
+    .legend-item:last-child { margin-bottom: 0; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.15); }
 
     /* ─── POPUP ──────────────────────────────────────────── */
     .leaflet-popup-content-wrapper {
-      background: var(--bg2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: var(--shadow);
+      background: var(--bg2); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow);
     }
     .leaflet-popup-tip { background: var(--bg2); }
     .popup-mag { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 6px; font-family: 'Space Mono', monospace; }
     .popup-row { font-size: 12px; color: var(--text-muted); margin: 3px 0; }
     .popup-row strong { color: var(--text); }
-
-    /* ─── LEGEND overlay ────────────────────────────────── */
-    .legend {
-      position: absolute;
-      right: 12px;
-      top: 12px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      z-index: 800;
-      font-size: 11px;
-      pointer-events: none;
-    }
-    .legend-title {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-dim);
-      font-family: 'Space Mono', monospace;
-      margin-bottom: 7px;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-bottom: 5px;
-      color: var(--text-muted);
-    }
-    .legend-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      border: 1.5px solid rgba(255,255,255,0.2);
-    }
   </style>
 </head>
 <body>
@@ -568,26 +429,19 @@
 <!-- ═══ HEADER ══════════════════════════════════════════ -->
 <header>
   <div class="header-left">
-    <button id="sidebar-toggle" title="Toggle Sidebar">
-      <svg viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M3 5h14a1 1 0 010 2H3a1 1 0 010-2zm0 4h14a1 1 0 010 2H3a1 1 0 010-2zm0 4h14a1 1 0 010 2H3a1 1 0 010-2z"/>
-      </svg>
-    </button>
     <div class="logo">
       <div class="logo-icon">🌏</div>
       <div class="logo-text">
-        <span class="title">WebGIS Gempa</span>
-        <span class="subtitle">BMKG Indonesia</span>
+        <span class="title" id="site-title">WebGIS Gempa BMKG</span>
+        <span class="subtitle">Monitoring Seismik Indonesia</span>
       </div>
     </div>
   </div>
-
   <div class="header-right">
     <div class="live-badge">
       <div class="live-dot"></div>
       LIVE
     </div>
-
     <label class="theme-toggle" title="Ganti tema">
       <span class="icon">🌙</span>
       <div class="toggle-pill">
@@ -600,103 +454,138 @@
   </div>
 </header>
 
-<!-- ═══ MAIN AREA ════════════════════════════════════════ -->
-<div class="main">
+<!-- ═══ MAIN ════════════════════════════════════════════ -->
+<div class="main" id="main-area">
 
   <!-- ─── SIDEBAR ──────────────────────────────────────── -->
   <div class="sidebar" id="sidebar">
-
-    <!-- View Switch -->
+    <!-- Tab switch -->
     <div class="view-switch">
       <button class="view-btn active" id="btn-peta" onclick="setView('peta')">🗺️ Peta</button>
       <button class="view-btn" id="btn-daftar" onclick="setView('daftar')">📋 Daftar Gempa</button>
     </div>
 
-    <!-- Scrollable content -->
     <div class="sb-scroll">
 
-      <!-- View: Peta (Filter + Basemap + Heatmap) -->
+      <!-- ═══ VIEW: PETA ════════════════════════════════ -->
       <div id="view-peta">
 
-        <!-- Filter -->
-        <div class="sb-section">
-          <div class="sb-section-title">🔍 Filter Magnitudo</div>
-          <div class="sb-body">
-            <div class="filter-row">
-              <div class="filter-label">
-                Minimum <span id="min-mag-val">0</span>
-              </div>
-              <input type="range" id="min-mag" min="0" max="9" step="0.5" value="0"
-                oninput="document.getElementById('min-mag-val').textContent=this.value"/>
+        <!-- [0] Deskripsi — selalu tampil -->
+        <div class="sb-desc">
+          <div class="sb-desc-title">ℹ️ Tentang WebGIS Ini</div>
+          <p>
+            Platform monitoring gempa bumi real-time untuk wilayah Indonesia.
+            Data diperbarui otomatis dari sumber resmi pemerintah.
+          </p>
+          <p>
+            <span class="db-badge">🗄️ BMKG API</span>
+            &nbsp;Badan Meteorologi, Klimatologi, dan Geofisika. Mencakup seluruh gempa yang tercatat jaringan seismograf nasional.
+          </p>
+          <div class="stat-inline">
+            <div class="stat-inline-item">
+              <span class="sil-val" id="si-total">–</span>
+              <span class="sil-lbl">Total Gempa</span>
             </div>
-            <div class="filter-row">
-              <div class="filter-label">
-                Maksimum <span id="max-mag-val">9</span>
-              </div>
-              <input type="range" id="max-mag" min="0" max="9" step="0.5" value="9"
-                oninput="document.getElementById('max-mag-val').textContent=this.value"/>
+            <div class="stat-inline-item">
+              <span class="sil-val" id="si-max">–</span>
+              <span class="sil-lbl">Maks. Mag.</span>
             </div>
-            <button id="apply-filter">Terapkan Filter</button>
-          </div>
-        </div>
-
-        <!-- Basemap -->
-        <div class="sb-section">
-          <div class="sb-section-title">🗾 Basemap</div>
-          <div class="sb-body">
-            <div class="basemap-grid">
-              <button class="basemap-btn active" onclick="switchBasemap('dark', this)">
-                <span class="bm-icon">🌑</span>Dark
-              </button>
-              <button class="basemap-btn" onclick="switchBasemap('light', this)">
-                <span class="bm-icon">🌤️</span>Light
-              </button>
-              <button class="basemap-btn" onclick="switchBasemap('satellite', this)">
-                <span class="bm-icon">🛰️</span>Satelit
-              </button>
-              <button class="basemap-btn" onclick="switchBasemap('topo', this)">
-                <span class="bm-icon">🏔️</span>Topografi
-              </button>
-              <button class="basemap-btn" onclick="switchBasemap('osm', this)">
-                <span class="bm-icon">🗺️</span>OpenStreetMap
-              </button>
-              <button class="basemap-btn" onclick="switchBasemap('terrain', this)">
-                <span class="bm-icon">🌿</span>Terrain
-              </button>
+            <div class="stat-inline-item">
+              <span class="sil-val" id="si-min">–</span>
+              <span class="sil-lbl">Min. Mag.</span>
+            </div>
+            <div class="stat-inline-item">
+              <span class="sil-val" id="si-avg">–</span>
+              <span class="sil-lbl">Rata-rata</span>
             </div>
           </div>
         </div>
 
-        <!-- Layer toggles -->
-        <div class="sb-section">
-          <div class="sb-section-title">🔧 Layer</div>
-          <div class="sb-body">
-            <div class="toggle-row">
-              <span class="toggle-row-label">
-                <span class="icon">🌡️</span> Heatmap
-              </span>
-              <label class="mini-toggle">
-                <input type="checkbox" id="heatmap-toggle"/>
-                <div class="mini-track"></div>
-                <div class="mini-thumb"></div>
-              </label>
-            </div>
-
-            <!-- Auto refresh interval -->
-            <div style="margin-top: 10px;">
-              <div class="refresh-label">
-                ⏱ Auto-refresh interval
-                <span id="refresh-interval-val">5 mnt</span>
+        <!-- [1] Filter — accordion, default closed -->
+        <div class="accordion" id="acc-filter">
+          <div class="accordion-header" onclick="toggleAccordion('acc-filter')">
+            <span class="accordion-label">
+              <span class="acc-icon">🔍</span> Filter Magnitudo
+            </span>
+            <svg class="accordion-chevron" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+            </svg>
+          </div>
+          <div class="accordion-body">
+            <div class="accordion-inner">
+              <div class="filter-row">
+                <div class="filter-label">Minimum <span id="min-mag-val">0</span></div>
+                <input type="range" id="min-mag" min="0" max="9" step="0.5" value="0"
+                  oninput="document.getElementById('min-mag-val').textContent=this.value"/>
               </div>
-              <input type="range" id="refresh-interval" min="1" max="30" step="1" value="5"
-                oninput="onRefreshIntervalChange(this.value)"/>
+              <div class="filter-row">
+                <div class="filter-label">Maksimum <span id="max-mag-val">9</span></div>
+                <input type="range" id="max-mag" min="0" max="9" step="0.5" value="9"
+                  oninput="document.getElementById('max-mag-val').textContent=this.value"/>
+              </div>
+              <button id="apply-filter">Terapkan Filter</button>
             </div>
           </div>
         </div>
 
-      </div>
+        <!-- [2] Basemap — accordion, default closed -->
+        <div class="accordion" id="acc-basemap">
+          <div class="accordion-header" onclick="toggleAccordion('acc-basemap')">
+            <span class="accordion-label">
+              <span class="acc-icon">🗾</span> Basemap
+            </span>
+            <svg class="accordion-chevron" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+            </svg>
+          </div>
+          <div class="accordion-body">
+            <div class="accordion-inner">
+              <div class="basemap-grid">
+                <button class="basemap-btn active" onclick="switchBasemap('dark',this)"><span class="bm-icon">🌑</span>Dark</button>
+                <button class="basemap-btn" onclick="switchBasemap('light',this)"><span class="bm-icon">🌤️</span>Light</button>
+                <button class="basemap-btn" onclick="switchBasemap('satellite',this)"><span class="bm-icon">🛰️</span>Satelit</button>
+                <button class="basemap-btn" onclick="switchBasemap('topo',this)"><span class="bm-icon">🏔️</span>Topografi</button>
+                <button class="basemap-btn" onclick="switchBasemap('osm',this)"><span class="bm-icon">🗺️</span>OpenStreetMap</button>
+                <button class="basemap-btn" onclick="switchBasemap('terrain',this)"><span class="bm-icon">🌿</span>Terrain</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <!-- View: Daftar Gempa -->
+        <!-- [3] Layer & Refresh — accordion, default closed -->
+        <div class="accordion" id="acc-layer">
+          <div class="accordion-header" onclick="toggleAccordion('acc-layer')">
+            <span class="accordion-label">
+              <span class="acc-icon">🔧</span> Layer & Refresh
+            </span>
+            <svg class="accordion-chevron" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+            </svg>
+          </div>
+          <div class="accordion-body">
+            <div class="accordion-inner">
+              <div class="toggle-row">
+                <span class="toggle-row-label">🌡️ Heatmap</span>
+                <label class="mini-toggle">
+                  <input type="checkbox" id="heatmap-toggle"/>
+                  <div class="mini-track"></div>
+                  <div class="mini-thumb"></div>
+                </label>
+              </div>
+              <div style="margin-top: 10px;">
+                <div class="refresh-label">
+                  ⏱ Auto-refresh <span id="refresh-interval-val">5 mnt</span>
+                </div>
+                <input type="range" id="refresh-interval" min="1" max="30" step="1" value="5"
+                  oninput="onRefreshIntervalChange(this.value)"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /view-peta -->
+
+      <!-- ═══ VIEW: DAFTAR GEMPA ════════════════════════ -->
       <div id="view-daftar" style="display:none;">
         <div class="gempa-list" id="gempa-list"></div>
       </div>
@@ -704,82 +593,97 @@
     </div><!-- /sb-scroll -->
   </div><!-- /sidebar -->
 
+  <!-- ─── SIDEBAR ARROW TOGGLE ─────────────────────────── -->
+  <!-- Sits in body space, vertically centered, left-edge of remaining space -->
+  <div id="sidebar-arrow" onclick="toggleSidebar()" title="Tampilkan / Sembunyikan Panel">
+    <!-- Left-pointing chevron (collapse direction) -->
+    <svg viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6,1 1,7 6,13"/>
+    </svg>
+  </div>
+
   <!-- ─── MAP ──────────────────────────────────────────── -->
   <div id="map">
-    <!-- Legend overlay -->
+
+    <!-- Legend (desktop) -->
     <div class="legend">
       <div class="legend-title">Magnitudo</div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background:var(--red)"></div>
-        ≥ 6.0 (Tinggi)
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>≥ 6.0 Tinggi</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>4.5–5.9 Sedang</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>&lt; 4.5 Rendah</div>
+    </div>
+
+    <!-- Floating Stats Bar -->
+    <div id="floating-stats">
+      <div class="fstat-row">
+        <div class="fstat-item">
+          <span class="fstat-val" id="stat-total">–</span>
+          <span class="fstat-lbl">Total</span>
+        </div>
+        <div class="fstat-item">
+          <span class="fstat-val" id="stat-max">–</span>
+          <span class="fstat-lbl">Maks M</span>
+        </div>
+        <div class="fstat-item">
+          <span class="fstat-val" id="stat-min">–</span>
+          <span class="fstat-lbl">Min M</span>
+        </div>
+        <div class="fstat-item">
+          <span class="fstat-val" id="stat-avg">–</span>
+          <span class="fstat-lbl">Rata²</span>
+        </div>
       </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background:var(--yellow)"></div>
-        4.5 – 5.9 (Sedang)
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background:var(--green)"></div>
-        &lt; 4.5 (Rendah)
+      <div class="fstat-footer">
+        <div class="upd">Update: <span id="last-updated">Memuat...</span></div>
+        <div class="refresh-mini-bar">
+          <div class="refresh-mini-fill" id="refresh-bar" style="width:100%"></div>
+        </div>
+        <div class="cd">Refresh <span class="cd-val" id="countdown-badge">–</span></div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /map -->
 
 </div><!-- /main -->
-
-<!-- ═══ STATUS BAR (bottom) ══════════════════════════════ -->
-<div class="status-bar">
-  <div class="stat-pill">
-    <div class="sp-label">Total</div>
-    <div class="sp-value" id="stat-total">–</div>
-  </div>
-  <div class="stat-pill">
-    <div class="sp-label">Maks M</div>
-    <div class="sp-value" id="stat-max">–</div>
-  </div>
-  <div class="stat-pill">
-    <div class="sp-label">Min M</div>
-    <div class="sp-value" id="stat-min">–</div>
-  </div>
-  <div class="stat-pill">
-    <div class="sp-label">Rata²</div>
-    <div class="sp-value" id="stat-avg">–</div>
-  </div>
-
-  <div class="status-bar-right">
-    <div class="refresh-mini-bar">
-      <div class="refresh-mini-fill" id="refresh-bar" style="width:100%"></div>
-    </div>
-    <div class="update-info">
-      <div class="upd-label">Update: <span id="last-updated">Memuat...</span></div>
-      <div class="countdown-row">
-        Refresh dalam <span class="cd-timer" id="countdown-badge">–</span>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ═══ SCRIPTS ══════════════════════════════════════════ -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
 <script>
-// ── Sidebar toggle ───────────────────────────────────────
-document.getElementById('sidebar-toggle').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-  setTimeout(() => map.invalidateSize(), 300);
-});
+// ── Mobile title ─────────────────────────────────────────
+function updateTitle() {
+  document.getElementById('site-title').textContent =
+    window.innerWidth <= 480 ? 'WebGIS Gempa' : 'WebGIS Gempa BMKG';
+}
+updateTitle();
+window.addEventListener('resize', updateTitle);
 
-// ── Theme toggle ─────────────────────────────────────────
-function toggleTheme(el) {
-  document.documentElement.setAttribute('data-theme', el.checked ? 'light' : 'dark');
-  // update basemap jika perlu
+// ── Sidebar toggle ───────────────────────────────────────
+function toggleSidebar() {
+  const sb   = document.getElementById('sidebar');
+  const body = document.body;
+  sb.classList.toggle('collapsed');
+  body.classList.toggle('sb-collapsed');
+  setTimeout(() => map.invalidateSize(), 300);
 }
 
-// ── View switch (Peta / Daftar) ──────────────────────────
+// ── Theme ─────────────────────────────────────────────────
+function toggleTheme(el) {
+  document.documentElement.setAttribute('data-theme', el.checked ? 'light' : 'dark');
+}
+
+// ── Accordion ────────────────────────────────────────────
+function toggleAccordion(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── View switch ──────────────────────────────────────────
 function setView(view) {
   document.getElementById('view-peta').style.display   = view === 'peta'   ? 'block' : 'none';
   document.getElementById('view-daftar').style.display = view === 'daftar' ? 'block' : 'none';
-  document.getElementById('btn-peta').classList.toggle('active', view === 'peta');
+  document.getElementById('btn-peta').classList.toggle('active',   view === 'peta');
   document.getElementById('btn-daftar').classList.toggle('active', view === 'daftar');
 }
 
@@ -797,18 +701,15 @@ let currentBaseTile = null;
 function switchBasemap(key, btn) {
   if (currentBaseTile) map.removeLayer(currentBaseTile);
   currentBaseTile = L.tileLayer(BASEMAPS[key], {
-    attribution: '© CartoDB / OSM / ESRI',
-    maxZoom: 18
+    attribution: '© CartoDB / OSM / ESRI', maxZoom: 18
   }).addTo(map);
   currentBaseTile.bringToBack();
   document.querySelectorAll('.basemap-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
-// ── Peta ─────────────────────────────────────────────────
+// ── Map init ─────────────────────────────────────────────
 const map = L.map('map', { center: [-2.5, 118], zoom: 5, zoomControl: true });
-
-// Default dark basemap
 currentBaseTile = L.tileLayer(BASEMAPS.dark, {
   attribution: '© CartoDB © OpenStreetMap', maxZoom: 18
 }).addTo(map);
@@ -817,7 +718,7 @@ let markersLayer = L.layerGroup().addTo(map);
 let heatLayer    = null;
 let currentData  = [];
 
-// ── Helpers ───────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────
 function getColor(mag) {
   if (mag >= 6)   return '#ef4444';
   if (mag >= 4.5) return '#f59e0b';
@@ -829,14 +730,17 @@ function getMagClass(mag) {
   return 'mag-rendah';
 }
 function makeCircle(mag) {
-  return {
-    radius: Math.max(6, mag * 4.5),
-    fillColor: getColor(mag),
-    color: '#fff',
-    weight: 1.5,
-    opacity: 0.9,
-    fillOpacity: 0.7
-  };
+  return { radius: Math.max(6, mag * 4.5), fillColor: getColor(mag), color: '#fff', weight: 1.5, opacity: 0.9, fillOpacity: 0.7 };
+}
+function makePopup(p, mag) {
+  return `
+    <div class="popup-mag ${getMagClass(mag)}">M ${mag}</div>
+    <div class="popup-row">📍 <strong>${p.wilayah}</strong></div>
+    <div class="popup-row">📅 ${p.tanggal} — ${p.jam}</div>
+    <div class="popup-row">⬇️ Kedalaman: <strong>${p.kedalaman}</strong></div>
+    <div class="popup-row">⚠️ Potensi: <strong>${p.potensi || 'Tidak ada info'}</strong></div>
+    <div class="popup-row">🫨 Dirasakan: <strong>${p.dirasakan || '-'}</strong></div>
+  `;
 }
 
 // ── Render ────────────────────────────────────────────────
@@ -844,28 +748,18 @@ function renderData(features) {
   markersLayer.clearLayers();
   document.getElementById('gempa-list').innerHTML = '';
   currentData = features;
-
   const heatPoints = [];
 
   features.forEach(f => {
     const p = f.properties;
     const [lon, lat] = f.geometry.coordinates;
     const mag = p.magnitude;
-
     heatPoints.push([lat, lon, mag / 9]);
 
     const circle = L.circleMarker([lat, lon], makeCircle(mag));
-    circle.bindPopup(`
-      <div class="popup-mag ${getMagClass(mag)}">M ${mag}</div>
-      <div class="popup-row">📍 <strong>${p.wilayah}</strong></div>
-      <div class="popup-row">📅 ${p.tanggal} — ${p.jam}</div>
-      <div class="popup-row">⬇️ Kedalaman: <strong>${p.kedalaman}</strong></div>
-      <div class="popup-row">⚠️ Potensi: <strong>${p.potensi || 'Tidak ada info'}</strong></div>
-      <div class="popup-row">🫨 Dirasakan: <strong>${p.dirasakan || '-'}</strong></div>
-    `, { maxWidth: 250 });
+    circle.bindPopup(makePopup(p, mag), { maxWidth: 250 });
     markersLayer.addLayer(circle);
 
-    // Daftar item
     const item = document.createElement('div');
     item.className = 'gempa-item';
     item.innerHTML = `
@@ -887,59 +781,48 @@ function renderData(features) {
   updateHeatmap(heatPoints);
 }
 
-// ── Heatmap ───────────────────────────────────────────────
+// ── Heatmap ──────────────────────────────────────────────
+function buildHeatLayer(points) {
+  return L.heatLayer(points, {
+    radius: 30, blur: 20, maxZoom: 10,
+    gradient: { 0.3: '#22c55e', 0.6: '#f59e0b', 1.0: '#ef4444' }
+  });
+}
 function updateHeatmap(points) {
   if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
   if (document.getElementById('heatmap-toggle').checked) {
-    heatLayer = L.heatLayer(points, {
-      radius: 30, blur: 20, maxZoom: 10,
-      gradient: { 0.3: '#22c55e', 0.6: '#f59e0b', 1.0: '#ef4444' }
-    }).addTo(map);
+    heatLayer = buildHeatLayer(points).addTo(map);
     markersLayer.clearLayers();
   }
 }
 
 document.getElementById('heatmap-toggle').addEventListener('change', function() {
-  const heatPoints = currentData.map(f => {
+  const pts = currentData.map(f => {
     const [lon, lat] = f.geometry.coordinates;
     return [lat, lon, f.properties.magnitude / 9];
   });
-
   if (this.checked) {
     markersLayer.clearLayers();
-    heatLayer = L.heatLayer(heatPoints, {
-      radius: 30, blur: 20, maxZoom: 10,
-      gradient: { 0.3: '#22c55e', 0.6: '#f59e0b', 1.0: '#ef4444' }
-    }).addTo(map);
+    heatLayer = buildHeatLayer(pts).addTo(map);
   } else {
     if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
     currentData.forEach(f => {
       const p = f.properties;
       const [lon, lat] = f.geometry.coordinates;
       const circle = L.circleMarker([lat, lon], makeCircle(p.magnitude));
-      circle.bindPopup(`
-        <div class="popup-mag ${getMagClass(p.magnitude)}">M ${p.magnitude}</div>
-        <div class="popup-row">📍 <strong>${p.wilayah}</strong></div>
-        <div class="popup-row">📅 ${p.tanggal} — ${p.jam}</div>
-        <div class="popup-row">⬇️ Kedalaman: <strong>${p.kedalaman}</strong></div>
-        <div class="popup-row">⚠️ Potensi: <strong>${p.potensi || 'Tidak ada info'}</strong></div>
-        <div class="popup-row">🫨 Dirasakan: <strong>${p.dirasakan || '-'}</strong></div>
-      `, { maxWidth: 250 });
+      circle.bindPopup(makePopup(p, p.magnitude), { maxWidth: 250 });
       markersLayer.addLayer(circle);
     });
   }
 });
 
-// ── Fetch data ────────────────────────────────────────────
+// ── Fetch ────────────────────────────────────────────────
 async function loadGempa(minMag = 0, maxMag = 10) {
   try {
-    const res = await fetch(
-      `https://web-production-567fb.up.railway.app/api/gempa?min_mag=${minMag}&max_mag=${maxMag}`
-    );
+    const res = await fetch(`https://web-production-567fb.up.railway.app/api/gempa?min_mag=${minMag}&max_mag=${maxMag}`);
     const geojson = await res.json();
     renderData(geojson.features);
-    document.getElementById('last-updated').textContent =
-      new Date().toLocaleTimeString('id-ID');
+    document.getElementById('last-updated').textContent = new Date().toLocaleTimeString('id-ID');
   } catch(e) {
     document.getElementById('last-updated').textContent = 'Gagal';
   }
@@ -949,43 +832,37 @@ async function loadStats() {
   try {
     const res  = await fetch('https://web-production-567fb.up.railway.app/api/stats');
     const data = await res.json();
-    document.getElementById('stat-total').textContent = data.total_gempa;
-    document.getElementById('stat-max').textContent   = data.magnitude_max;
-    document.getElementById('stat-min').textContent   = data.magnitude_min;
-    document.getElementById('stat-avg').textContent   = data.magnitude_rata_rata;
+    ['stat-total','stat-max','stat-min','stat-avg'].forEach((id, i) => {
+      document.getElementById(id).textContent = [data.total_gempa, data.magnitude_max, data.magnitude_min, data.magnitude_rata_rata][i];
+    });
+    ['si-total','si-max','si-min','si-avg'].forEach((id, i) => {
+      document.getElementById(id).textContent = [data.total_gempa, data.magnitude_max, data.magnitude_min, data.magnitude_rata_rata][i];
+    });
   } catch(e) {}
 }
 
-// ── Auto Refresh ──────────────────────────────────────────
+// ── Auto Refresh ─────────────────────────────────────────
 let refreshIntervalMinutes = 5;
-let secondsLeft = refreshIntervalMinutes * 60;
-let refreshTimer   = null;
-let countdownTimer = null;
+let secondsLeft = 300;
+let refreshTimer = null, countdownTimer = null;
 
 function startAutoRefresh() {
-  clearInterval(refreshTimer);
-  clearInterval(countdownTimer);
+  clearInterval(refreshTimer); clearInterval(countdownTimer);
   secondsLeft = refreshIntervalMinutes * 60;
 
   async function doRefresh() {
     try { await fetch('https://web-production-567fb.up.railway.app/api/fetch-bmkg'); } catch(e) {}
-    const minMag = document.getElementById('min-mag').value;
-    const maxMag = document.getElementById('max-mag').value;
-    await loadGempa(minMag, maxMag);
+    await loadGempa(document.getElementById('min-mag').value, document.getElementById('max-mag').value);
     await loadStats();
     secondsLeft = refreshIntervalMinutes * 60;
   }
 
   refreshTimer = setInterval(doRefresh, refreshIntervalMinutes * 60 * 1000);
-
   countdownTimer = setInterval(() => {
     secondsLeft--;
-    const m = Math.floor(secondsLeft / 60);
-    const s = secondsLeft % 60;
-    document.getElementById('countdown-badge').textContent =
-      `${m}:${s.toString().padStart(2,'0')}`;
-    const pct = (secondsLeft / (refreshIntervalMinutes * 60)) * 100;
-    document.getElementById('refresh-bar').style.width = pct + '%';
+    const m = Math.floor(secondsLeft / 60), s = secondsLeft % 60;
+    document.getElementById('countdown-badge').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    document.getElementById('refresh-bar').style.width = (secondsLeft / (refreshIntervalMinutes * 60) * 100) + '%';
     if (secondsLeft <= 0) secondsLeft = refreshIntervalMinutes * 60;
   }, 1000);
 }
@@ -998,9 +875,7 @@ function onRefreshIntervalChange(val) {
 
 // ── Filter ────────────────────────────────────────────────
 document.getElementById('apply-filter').addEventListener('click', () => {
-  const minMag = document.getElementById('min-mag').value;
-  const maxMag = document.getElementById('max-mag').value;
-  loadGempa(minMag, maxMag);
+  loadGempa(document.getElementById('min-mag').value, document.getElementById('max-mag').value);
 });
 
 // ── Init ──────────────────────────────────────────────────
