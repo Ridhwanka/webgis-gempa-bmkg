@@ -422,6 +422,16 @@
     .popup-mag { font-size: 26px; font-weight: 800; text-align: center; margin-bottom: 6px; font-family: 'Space Mono', monospace; }
     .popup-row { font-size: 12px; color: var(--text-muted); margin: 3px 0; }
     .popup-row strong { color: var(--text); }
+
+    @keyframes live-pulse {
+        0%   { opacity: 1; }
+        50%  { opacity: 0.4; }
+        100% { opacity: 1; }
+    }
+    .live-marker {
+        animation: live-pulse 1.5s infinite;
+    }
+
   </style>
 </head>
 <body>
@@ -846,21 +856,42 @@ async function loadStats() {
 let refreshIntervalMinutes = 5;
 let secondsLeft = 300;
 let refreshTimer = null, countdownTimer = null;
+let elapsedSeconds = 0;
 
 function startAutoRefresh() {
   clearInterval(refreshTimer); clearInterval(countdownTimer);
   secondsLeft = refreshIntervalMinutes * 60;
 
+  // BARU — ganti dengan ini:
   async function doRefresh() {
-    try { await fetch('https://web-production-567fb.up.railway.app/api/fetch-bmkg'); } catch(e) {}
-    await loadGempa(document.getElementById('min-mag').value, document.getElementById('max-mag').value);
-    await loadStats();
-    secondsLeft = refreshIntervalMinutes * 60;
+      document.getElementById('refresh-dot').classList.remove('paused');
+
+      // Selalu fetch autogempa setiap refresh (paling cepat)
+      try { await fetch('https://web-production-567fb.up.railway.app/api/fetch-auto'); } catch(e) {}
+      await loadGempaLive();
+
+      // Fetch dirasakan setiap 5 menit
+      if (elapsedSeconds % 300 === 0) {
+          try { await fetch('https://web-production-567fb.up.railway.app/api/fetch-dirasakan'); } catch(e) {}
+         await loadGempaBarU();
+      }
+
+      // Fetch terkini setiap 15 menit
+      if (elapsedSeconds % 900 === 0) {
+         try { await fetch('https://web-production-567fb.up.railway.app/api/fetch-bmkg'); } catch(e) {}
+         const minMag = document.getElementById('min-mag').value;
+         const maxMag = document.getElementById('max-mag').value;
+         await loadGempa(minMag, maxMag);
+         await loadStats();
+      }
+
+      secondsLeft = refreshIntervalMinutes * 60;
   }
 
   refreshTimer = setInterval(doRefresh, refreshIntervalMinutes * 60 * 1000);
   countdownTimer = setInterval(() => {
     secondsLeft--;
+    elapsedSeconds++;
     const m = Math.floor(secondsLeft / 60), s = secondsLeft % 60;
     document.getElementById('countdown-badge').textContent = `${m}:${s.toString().padStart(2,'0')}`;
     document.getElementById('refresh-bar').style.width = (secondsLeft / (refreshIntervalMinutes * 60) * 100) + '%';
@@ -882,7 +913,91 @@ document.getElementById('apply-filter').addEventListener('click', () => {
 // ── Init ──────────────────────────────────────────────────
 loadStats();
 loadGempa();
+loadGempaLive();
+loadGempaBarU();
 startAutoRefresh();
+
+
+// Layer terpisah untuk tiap status
+let liveLayer  = L.layerGroup().addTo(map);
+let baruLayer  = L.layerGroup().addTo(map);
+
+// Load gempa LIVE (autogempa)
+async function loadGempaLive() {
+    const res = await fetch('https://https://web-production-567fb.up.railway.app/api/gempa-auto');
+    const geojson = await res.json();
+    liveLayer.clearLayers();
+
+    geojson.features.forEach(f => {
+        const p = f.properties;
+        const [lon, lat] = f.geometry.coordinates;
+
+        // Marker berkedip untuk LIVE
+        const circle = L.circleMarker([lat, lon], {
+            radius: Math.max(10, p.magnitude * 5),
+            fillColor: '#ef4444',
+            color: '#ffffff',
+            weight: 2,
+            fillOpacity: 0.9,
+            className: 'live-marker'  // untuk animasi CSS
+        });
+
+        circle.bindPopup(`
+            <div style="text-align:center">
+                <span style="background:#ef4444;color:white;padding:2px 8px;
+                      border-radius:4px;font-size:11px;font-weight:700">
+                    🔴 LIVE
+                </span>
+                <div class="popup-mag mag-tinggi" style="margin-top:6px">
+                    M ${p.magnitude}
+                </div>
+                <div class="popup-row">📍 <strong>${p.wilayah}</strong></div>
+                <div class="popup-row">📅 ${p.tanggal} — ${p.jam}</div>
+                <div class="popup-row">⬇️ ${p.kedalaman}</div>
+            </div>
+        `);
+
+        liveLayer.addLayer(circle);
+    });
+}
+
+// Load gempa BARU (dirasakan)
+async function loadGempaBarU() {
+    const res = await fetch('https://https://web-production-567fb.up.railway.app/api/gempa-dirasakan');
+    const geojson = await res.json();
+    baruLayer.clearLayers();
+
+    geojson.features.forEach(f => {
+        const p = f.properties;
+        const [lon, lat] = f.geometry.coordinates;
+
+        const circle = L.circleMarker([lat, lon], {
+            radius: Math.max(8, p.magnitude * 4),
+            fillColor: '#f59e0b',
+            color: '#ffffff',
+            weight: 2,
+            fillOpacity: 0.8
+        });
+
+        circle.bindPopup(`
+            <div style="text-align:center">
+                <span style="background:#f59e0b;color:white;padding:2px 8px;
+                      border-radius:4px;font-size:11px;font-weight:700">
+                    🟡 BARU
+                </span>
+                <div class="popup-mag mag-sedang" style="margin-top:6px">
+                    M ${p.magnitude}
+                </div>
+                <div class="popup-row">📍 <strong>${p.wilayah}</strong></div>
+                <div class="popup-row">📅 ${p.tanggal} — ${p.jam}</div>
+                <div class="popup-row">🫨 ${p.dirasakan || '-'}</div>
+            </div>
+        `);
+
+        baruLayer.addLayer(circle);
+    });
+}
+
 </script>
 </body>
 </html>

@@ -100,7 +100,83 @@ def get_stats():
         "magnitude_rata_rata": row[3]
     }
 
+# --- Endpoint: autogempa (LIVE) ---
+@app.get("/api/gempa-auto")
+def get_gempa_auto():
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT 
+            id, tanggal::text, jam::text, magnitude,
+            kedalaman, wilayah,
+            ST_X(geom) as lon, ST_Y(geom) as lat
+        FROM gempa_auto
+        ORDER BY fetched_at DESC
+        LIMIT 1
+    """)
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
 
+    features = []
+    for row in rows:
+        features.append({
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [row[6], row[7]]
+            },
+            "properties": {
+                "id": row[0],
+                "tanggal": row[1],
+                "jam": row[2],
+                "magnitude": row[3],
+                "kedalaman": row[4],
+                "wilayah": row[5],
+                "status": "LIVE"
+            }
+        })
+    return {"type": "FeatureCollection", "features": features}
+
+
+# --- Endpoint: gempa dirasakan (BARU) ---
+@app.get("/api/gempa-dirasakan")
+def get_gempa_dirasakan():
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT 
+            id, tanggal::text, jam::text, magnitude,
+            kedalaman, wilayah, dirasakan,
+            ST_X(geom) as lon, ST_Y(geom) as lat
+        FROM gempa_dirasakan
+        ORDER BY tanggal DESC, jam DESC
+        LIMIT 15
+    """)
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    features = []
+    for row in rows:
+        features.append({
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [row[7], row[8]]
+            },
+            "properties": {
+                "id": row[0],
+                "tanggal": row[1],
+                "jam": row[2],
+                "magnitude": row[3],
+                "kedalaman": row[4],
+                "wilayah": row[5],
+                "dirasakan": row[6],
+                "status": "BARU"
+            }
+        })
+    return {"type": "FeatureCollection", "features": features}
 
 @app.get("/api/fetch-bmkg")
 def trigger_fetch():
@@ -145,5 +221,84 @@ def trigger_fetch():
         conn.close()
         return {"status": "ok", "fetched": count}
 
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    
+# --- Trigger fetch autogempa ---
+@app.get("/api/fetch-auto")
+def fetch_auto():
+    try:
+        url = "https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json"
+        response = req_http.get(url, timeout=10)
+        data = response.json()
+        g = data["Infogempa"]["gempa"]  # objek tunggal, bukan list
+
+        lintang_str = g["Lintang"].replace("°", "").strip()
+        if "LU" in lintang_str:
+            lat = float(lintang_str.replace(" LU", "").strip())
+        elif "LS" in lintang_str:
+            lat = -float(lintang_str.replace(" LS", "").strip())
+        else:
+            lat = float(lintang_str)
+        lon = float(g["Bujur"].replace(" BT", "").replace("°", "").strip())
+        jam_str = g["Jam"].split(" ")[0]
+
+        conn = get_conn()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO gempa_auto
+                (tanggal, jam, magnitude, kedalaman, wilayah, geom)
+            VALUES (%s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326))
+            ON CONFLICT ON CONSTRAINT gempa_auto_unique DO NOTHING
+        """, (
+            g["Tanggal"], jam_str, float(g["Magnitude"]),
+            g["Kedalaman"], g["Wilayah"], lon, lat
+        ))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"status": "ok", "gempa": g["Wilayah"]}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+# --- Trigger fetch gempa dirasakan ---
+@app.get("/api/fetch-dirasakan")
+def fetch_dirasakan():
+    try:
+        url = "https://data.bmkg.go.id/DataMKG/TEWS/gempadirasakan.json"
+        response = req_http.get(url, timeout=10)
+        data = response.json()
+        gempa_list = data["Infogempa"]["gempa"]
+
+        conn = get_conn()
+        cur = conn.cursor()
+        count = 0
+        for g in gempa_list:
+            lintang_str = g["Lintang"].replace("°", "").strip()
+            if "LU" in lintang_str:
+                lat = float(lintang_str.replace(" LU", "").strip())
+            elif "LS" in lintang_str:
+                lat = -float(lintang_str.replace(" LS", "").strip())
+            else:
+                lat = float(lintang_str)
+            lon = float(g["Bujur"].replace(" BT", "").replace("°", "").strip())
+            jam_str = g["Jam"].split(" ")[0]
+
+            cur.execute("""
+                INSERT INTO gempa_dirasakan
+                    (tanggal, jam, magnitude, kedalaman, wilayah, dirasakan, geom)
+                VALUES (%s, %s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326))
+                ON CONFLICT ON CONSTRAINT gempa_dirasakan_unique DO NOTHING
+            """, (
+                g["Tanggal"], jam_str, float(g["Magnitude"]),
+                g["Kedalaman"], g["Wilayah"],
+                g.get("Dirasakan", ""), lon, lat
+            ))
+            count += 1
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"status": "ok", "fetched": count}
     except Exception as e:
         return {"status": "error", "message": str(e)}
